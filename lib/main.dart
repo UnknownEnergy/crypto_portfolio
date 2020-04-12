@@ -1,3 +1,4 @@
+import 'package:crypto_portfolio/services/database.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -46,8 +47,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
+  Future<void> _incrementCounter() async {
+    //TODO adds a new coin to firebase!
+//    await DatabaseService().addCoin("test", "TEST");
+    setState((){
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
