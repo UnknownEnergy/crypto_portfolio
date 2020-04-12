@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1076653137694",
+    "firebase_url": "https://cryptoportfolio-6312e.firebaseio.com",
+    "project_id": "cryptoportfolio-6312e",
+    "storage_bucket": "cryptoportfolio-6312e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "android_client_info": {
+          "package_name": "com.github.unknown_energy.crypto_portfolio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
