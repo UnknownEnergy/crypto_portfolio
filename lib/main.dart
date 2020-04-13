@@ -1,5 +1,7 @@
-import 'package:crypto_portfolio/services/database.dart';
+import 'package:crypto_portfolio/services/userDatabase.dart';
 import 'package:flutter/material.dart';
+
+import 'models/user.dart';
 
 void main() => runApp(MyApp());
 
@@ -50,7 +52,17 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _incrementCounter() async {
     //TODO adds a new coin to firebase!
 //    await DatabaseService().addCoin("test", "TEST");
-    setState((){
+    User user = await UserDatabaseService().getUser("8OVUysbfvuvM9HLDZ5bT");
+//    print(user.toString());
+//    user.password = "1224";
+//    await DatabaseService().updateUser(user);
+//    await DatabaseService().addUser(new User(null, "hi@gm.at", "123"));
+//    await DatabaseService().deleteUser("0yhfUz169wOhxNa7yH5w");
+    for (User user in await UserDatabaseService().getAllUsers()) {
+      print(user.toString());
+    }
+
+    setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
