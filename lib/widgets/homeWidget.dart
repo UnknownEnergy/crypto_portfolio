@@ -1,7 +1,8 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:crypto_portfolio/widgets/userWidget.dart';
 import 'package:crypto_portfolio/widgets/moderatorWidget.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 
 class HomeWidget extends StatefulWidget {
   HomeWidget({Key key, this.title}) : super(key: key);
