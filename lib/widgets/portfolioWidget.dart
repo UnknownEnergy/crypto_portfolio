@@ -30,6 +30,9 @@ class PortfolioWidget extends StatelessWidget {
                     PieChart(dataMap: dataMap),
                     SmoothStarRating(
                         allowHalfRating: false,
+                        onRatingChanged: (v) {
+                          rating = v;
+                        },
                         starCount: 5,
                         rating: rating,
                         size: 40.0,
@@ -37,8 +40,7 @@ class PortfolioWidget extends StatelessWidget {
                         halfFilledIconData: Icons.star_half,
                         color: Colors.green,
                         borderColor: Colors.green,
-                        spacing:0.0
-                    ),
+                        spacing: 0.0),
                     QrImage(
                       data: "12345",
                       version: QrVersions.auto,
