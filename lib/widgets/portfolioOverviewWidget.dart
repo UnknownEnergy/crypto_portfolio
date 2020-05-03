@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
+import 'package:smooth_star_rating/smooth_star_rating.dart';
 
 import 'managePortfolioWidget.dart';
 
@@ -25,7 +26,23 @@ class PortfolioOverviewWidget extends StatelessWidget {
             itemBuilder: (context, index) {
               Portfolio portfolio = snap.data[index];
               return GestureDetector(
-                child: Text("Name: " + portfolio.name),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(portfolio.name),
+                      SmoothStarRating(
+                          allowHalfRating: false,
+                          starCount: 5,
+                          rating: 4,
+                          size: 20.0,
+                          filledIconData: Icons.star,
+                          halfFilledIconData: Icons.star_half,
+                          color: Colors.green,
+                          borderColor: Colors.green,
+                          spacing:0.0
+                      ),
+                    ]),
                 onTap: () => {
                   Navigator.push(
                       context,
@@ -56,17 +73,19 @@ class PortfolioOverviewWidget extends StatelessWidget {
         shape: CircleBorder(),
         children: [
           SpeedDialChild(
-              child: Icon(Icons.add),
-              backgroundColor: Colors.blue,
-              label: 'New Portolio',
-              onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ManagePortfolioWidget())),
+            child: Icon(Icons.add),
+            backgroundColor: Colors.blue,
+            label: 'New Portolio',
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ManagePortfolioWidget())),
           ),
           SpeedDialChild(
             child: Icon(Icons.camera_alt),
             backgroundColor: Colors.blue,
             label: 'Scan QR Code',
-            onTap: () async =>  {
+            onTap: () async => {
               portfolioId = await scanner.scan(),
             },
           ),
