@@ -11,6 +11,7 @@ import 'managePortfolioWidget.dart';
 class PortfolioOverviewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    String portfolioId;
     return Scaffold(
       body: Center(
           child: FutureBuilder(
@@ -65,7 +66,9 @@ class PortfolioOverviewWidget extends StatelessWidget {
             child: Icon(Icons.camera_alt),
             backgroundColor: Colors.blue,
             label: 'Scan QR Code',
-            onTap: () async => await scanner.scan(),
+            onTap: () async =>  {
+              portfolioId = await scanner.scan(),
+            },
           ),
         ],
       ),
