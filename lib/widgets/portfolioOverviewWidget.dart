@@ -4,6 +4,7 @@ import 'package:crypto_portfolio/widgets/portfolioWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:qrscan/qrscan.dart' as scanner;
 
 import 'managePortfolioWidget.dart';
 
@@ -64,7 +65,7 @@ class PortfolioOverviewWidget extends StatelessWidget {
             child: Icon(Icons.camera_alt),
             backgroundColor: Colors.blue,
             label: 'Scan QR Code',
-            onTap: () => print('CAMERA'),
+            onTap: () async => await scanner.scan(),
           ),
         ],
       ),
