@@ -24,7 +24,7 @@ class PortfolioWidget extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => ManagePortfolioWidget()));
                 },
                 child: Icon(Icons.edit),
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.red,
               ),
             )));
   }
