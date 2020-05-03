@@ -1,4 +1,5 @@
 import 'package:crypto_portfolio/widgets/homeWidget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomeWidget(title: 'Crypto Portfolio Home Page'),
+      home: HomeWidget(),
     );
   }
 }
