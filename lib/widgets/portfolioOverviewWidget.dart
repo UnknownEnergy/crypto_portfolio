@@ -1,5 +1,7 @@
 import 'package:crypto_portfolio/models/portfolio.dart';
+import 'package:crypto_portfolio/models/rating.dart';
 import 'package:crypto_portfolio/services/portfolioDatabase.dart';
+import 'package:crypto_portfolio/services/ratingDatabase.dart';
 import 'package:crypto_portfolio/widgets/portfolioWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,17 +33,7 @@ class PortfolioOverviewWidget extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       Text(portfolio.name),
-                      SmoothStarRating(
-                          allowHalfRating: false,
-                          starCount: 5,
-                          rating: 4,
-                          size: 20.0,
-                          filledIconData: Icons.star,
-                          halfFilledIconData: Icons.star_half,
-                          color: Colors.green,
-                          borderColor: Colors.green,
-                          spacing:0.0
-                      ),
+                      buildStarRating(portfolio),
                     ]),
                 onTap: () => {
                   Navigator.push(
@@ -91,6 +83,39 @@ class PortfolioOverviewWidget extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  FutureBuilder<List<Rating>> buildStarRating(Portfolio portfolio) {
+    return FutureBuilder(
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.none || snap.data == null) {
+          return SmoothStarRating();
+        }
+        double starCounter = 0;
+        List<Rating> ratings = snap.data;
+        List<int> portfolioRatings = ratings
+            .where((rating) => rating.portfolioId == portfolio.id)
+            .map((rating) => rating.stars)
+            .toList();
+
+        if (portfolioRatings.length == 1) {
+          starCounter = portfolioRatings.first.toDouble();
+        } else if (portfolioRatings.length == 0) {
+          starCounter = 0;
+        } else {
+          starCounter = portfolioRatings.reduce((a, b) => a + b) /
+              portfolioRatings.length;
+        }
+        return SmoothStarRating(
+            allowHalfRating: false,
+            starCount: 5,
+            rating: starCounter,
+            filledIconData: Icons.star,
+            halfFilledIconData: Icons.star_half,
+            spacing: 0.0);
+      },
+      future: new RatingDatabaseService().getAllRatings(),
     );
   }
 }
