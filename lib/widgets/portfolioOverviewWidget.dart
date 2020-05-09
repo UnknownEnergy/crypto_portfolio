@@ -33,13 +33,13 @@ class PortfolioOverviewWidget extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       Text(portfolio.name),
-                      buildStarRating(portfolio),
+                      buildStarRating(portfolio.id),
                     ]),
                 onTap: () => {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => PortfolioWidget())),
+                          builder: (context) => PortfolioWidget(portfolio))),
                 },
               );
             },
@@ -83,39 +83,6 @@ class PortfolioOverviewWidget extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  FutureBuilder<List<Rating>> buildStarRating(Portfolio portfolio) {
-    return FutureBuilder(
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.none || snap.data == null) {
-          return SmoothStarRating();
-        }
-        double starCounter = 0;
-        List<Rating> ratings = snap.data;
-        List<int> portfolioRatings = ratings
-            .where((rating) => rating.portfolioId == portfolio.id)
-            .map((rating) => rating.stars)
-            .toList();
-
-        if (portfolioRatings.length == 1) {
-          starCounter = portfolioRatings.first.toDouble();
-        } else if (portfolioRatings.length == 0) {
-          starCounter = 0;
-        } else {
-          starCounter = portfolioRatings.reduce((a, b) => a + b) /
-              portfolioRatings.length;
-        }
-        return SmoothStarRating(
-            allowHalfRating: false,
-            starCount: 5,
-            rating: starCounter,
-            filledIconData: Icons.star,
-            halfFilledIconData: Icons.star_half,
-            spacing: 0.0);
-      },
-      future: new RatingDatabaseService().getAllRatings(),
     );
   }
 }

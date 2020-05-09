@@ -1,3 +1,10 @@
+import 'package:crypto_portfolio/models/coin.dart';
+import 'package:crypto_portfolio/models/portfolio.dart';
+import 'package:crypto_portfolio/models/portfolioCoin.dart';
+import 'package:crypto_portfolio/models/rating.dart';
+import 'package:crypto_portfolio/services/coinDatabase.dart';
+import 'package:crypto_portfolio/services/portfolioCoinDatabase.dart';
+import 'package:crypto_portfolio/services/ratingDatabase.dart';
 import 'package:crypto_portfolio/widgets/managePortfolioWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,16 +13,14 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 
 class PortfolioWidget extends StatelessWidget {
-  Map<String, double> dataMap = new Map();
-  double rating = 4;
+  Portfolio portfolio;
+
+  PortfolioWidget(Portfolio portfolio) {
+    this.portfolio = portfolio;
+  }
 
   @override
   Widget build(BuildContext context) {
-    dataMap.putIfAbsent("Flutter", () => 5);
-    dataMap.putIfAbsent("React", () => 3);
-    dataMap.putIfAbsent("Xamarin", () => 2);
-    dataMap.putIfAbsent("Ionic", () => 2);
-
     return MaterialApp(
         home: DefaultTabController(
             length: 2,
@@ -27,22 +32,12 @@ class PortfolioWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    PieChart(dataMap: dataMap),
-                    SmoothStarRating(
-                        allowHalfRating: false,
-                        onRatingChanged: (v) {
-                          rating = v;
-                        },
-                        starCount: 5,
-                        rating: rating,
-                        size: 40.0,
-                        filledIconData: Icons.star,
-                        halfFilledIconData: Icons.star_half,
-                        color: Colors.green,
-                        borderColor: Colors.green,
-                        spacing: 0.0),
+                    Text(portfolio.name),
+                    Text(portfolio.description),
+                    buildPortfolioChart(this.portfolio.id),
+                    buildStarRating(this.portfolio.id),
                     QrImage(
-                      data: "12345",
+                      data: portfolio.id,
                       version: QrVersions.auto,
                       size: 200.0,
                     ),
@@ -59,4 +54,96 @@ class PortfolioWidget extends StatelessWidget {
               ),
             )));
   }
+
+  FutureBuilder<List<dynamic>> buildPortfolioChart(String portfolioId) {
+    return FutureBuilder(
+      builder: (context, AsyncSnapshot<List<dynamic>> snap) {
+        if (snap.connectionState == ConnectionState.none ||
+            snap.data == null ||
+            snap.data.length != 2) {
+          return Container();
+        }
+        Map<String, double> dataMap = new Map();
+        List<PortfolioCoin> portfolioCoins = snap.data[0]
+            .where((portfolioCoin) => portfolioCoin.portfolioId == portfolioId)
+            .toList();
+
+        if (portfolioCoins.length == 0) {
+          dataMap.putIfAbsent("None", () => 100);
+        } else {
+          portfolioCoins.forEach((portfolioCoin) {
+            Coin coin = snap.data[1]
+                .where((coin) => coin.id == portfolioCoin.coinId)
+                .first;
+            dataMap.putIfAbsent(coin.name, () => portfolioCoin.percent);
+          });
+        }
+        return PieChart(dataMap: dataMap);
+      },
+      future: Future.wait([
+        new PortfolioCoinDatabaseService().getAllPortfolioCoins(),
+        new CoinDatabaseService().getAllCoins()
+      ]),
+    );
+  }
+}
+
+FutureBuilder<List<Rating>> buildStarRating(String portfolioId) {
+  return FutureBuilder(
+    builder: (context, snap) {
+      if (snap.connectionState == ConnectionState.none || snap.data == null) {
+        return SmoothStarRating();
+      }
+
+      double starCounter = 0;
+      List<Rating> ratings = snap.data;
+      List<double> portfolioRatings = ratings
+          .where((rating) => rating.portfolioId == portfolioId)
+          .map((rating) => rating.stars)
+          .toList();
+
+      if (portfolioRatings.length == 1) {
+        starCounter = portfolioRatings.first;
+      } else if (portfolioRatings.length == 0) {
+        starCounter = 0;
+      } else {
+        starCounter = portfolioRatings.reduce((a, b) => a + b) /
+            portfolioRatings.length;
+      }
+      return SmoothStarRating(
+          allowHalfRating: false,
+          starCount: 5,
+          rating: starCounter,
+          onRatingChanged: (stars) {
+            _showDialog(context,"Voted!", "You voted with "+ stars.toString() + " stars");
+            //TODO userID hardcoded
+            new RatingDatabaseService().addRating(new Rating("", "8OVUysbfvuvM9HLDZ5bT", portfolioId, stars));
+          },
+          filledIconData: Icons.star,
+          halfFilledIconData: Icons.star_half,
+          spacing: 0.0);
+    },
+    future: new RatingDatabaseService().getAllRatings(),
+  );
+}
+
+
+void _showDialog(BuildContext context, String title, String message) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: new Text(title),
+        content: new Text(message),
+        actions: <Widget>[
+          new FlatButton(
+            child: new Text("Close"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
 }

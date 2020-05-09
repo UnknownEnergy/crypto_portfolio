@@ -10,7 +10,7 @@ class PortfolioCoin {
 
   factory PortfolioCoin.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data;
-    return PortfolioCoin(doc.documentID, data['coinId'], data['portfolioId'], data['percent']);
+    return PortfolioCoin(doc.documentID, data['coinId'], data['portfolioId'], data['percent'].toDouble());
   }
 
   Map<String, dynamic> toMap() {
