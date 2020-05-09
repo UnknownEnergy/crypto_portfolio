@@ -12,6 +12,14 @@ import 'package:searchable_dropdown/searchable_dropdown.dart';
 class ManagePortfolioWidget extends StatelessWidget {
   TextEditingController portfolioNameController = new TextEditingController();
   TextEditingController portfolioDescController = new TextEditingController();
+  Portfolio currentPortfolio;
+
+  ManagePortfolioWidget(Portfolio currentPortfolio) {
+    this.currentPortfolio = currentPortfolio;
+
+    portfolioNameController.text = currentPortfolio?.name ?? " ";
+    portfolioDescController.text = currentPortfolio?.description ?? " ";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,27 +54,64 @@ class ManagePortfolioWidget extends StatelessWidget {
                 buildCoinList(),
                 RaisedButton(
                   onPressed: () {
-                    //TODO hardcoded userId
-                    new PortfolioDatabaseService()
-                        .addPortfolio(new Portfolio(
-                            "",
-                            portfolioNameController.text,
-                            portfolioDescController.text,
-                            "1234"))
-                        .then((documentReference) {
-                      new PortfolioCoinDatabaseService().addPortfolioCoin(
-                          new PortfolioCoin(
+                    if (currentPortfolio != null) {
+                      currentPortfolio.name = portfolioNameController.text;
+                      currentPortfolio.description =
+                          portfolioDescController.text;
+                      new PortfolioDatabaseService()
+                          .updatePortfolio(currentPortfolio);
+                      new PortfolioCoinDatabaseService()
+                          .getAllPortfolioCoins()
+                          .then((portfolioCoins) {
+                        portfolioCoins
+                            .where((portfolioCoin) =>
+                                portfolioCoin.portfolioId ==
+                                currentPortfolio.id)
+                            .forEach((portfolioCoin) {
+//                              portfolioCoin.percent = double.parse(percentController.text);
+//                          new PortfolioCoinDatabaseService()
+//                              .updatePortfolioCoin(portfolioCoin);
+                        });
+                      });
+                    } else {
+                      //TODO hardcoded userId
+                      new PortfolioDatabaseService()
+                          .addPortfolio(new Portfolio(
                               "",
-                              dropdownKey,
-                              documentReference.documentID,
-                              double.parse(percentController.text)));
-                    });
+                              portfolioNameController.text,
+                              portfolioDescController.text,
+                              "1234"))
+                          .then((documentReference) {
+                        new PortfolioCoinDatabaseService().addPortfolioCoin(
+                            new PortfolioCoin(
+                                "",
+                                dropdownKey,
+                                documentReference.documentID,
+                                double.parse(percentController.text)));
+                      });
+                    }
                     Navigator.pop(context);
                   },
                   child: Text('Save'),
                 ),
                 RaisedButton(
                   onPressed: () {
+                    if (currentPortfolio != null) {
+                      new PortfolioDatabaseService()
+                          .deletePortfolio(currentPortfolio.id);
+                      new PortfolioCoinDatabaseService()
+                          .getAllPortfolioCoins()
+                          .then((portfolioCoins) {
+                        portfolioCoins
+                            .where((portfolioCoin) =>
+                                portfolioCoin.portfolioId ==
+                                currentPortfolio.id)
+                            .forEach((portfolioCoin) {
+                          new PortfolioCoinDatabaseService()
+                              .deletePortfolioCoin(portfolioCoin.id);
+                        });
+                      });
+                    }
                     Navigator.pop(context);
                   },
                   child: Text('Delete'),
@@ -76,7 +121,8 @@ class ManagePortfolioWidget extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ModeratorWidget()),
+                          builder: (context) =>
+                              ModeratorWidget(currentPortfolio)),
                     );
                   },
                   child: Text('Manage Moderators'),

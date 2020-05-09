@@ -47,7 +47,7 @@ class PortfolioWidget extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ManagePortfolioWidget()));
+                          builder: (context) => ManagePortfolioWidget(portfolio)));
                 },
                 child: Icon(Icons.edit),
                 backgroundColor: Colors.red,

@@ -1,9 +1,16 @@
 import 'package:crypto_portfolio/models/moderator.dart';
+import 'package:crypto_portfolio/models/portfolio.dart';
 import 'package:crypto_portfolio/services/moderatorDatabase.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ModeratorWidget extends StatelessWidget {
+  Portfolio currentPortfolio;
+
+  ModeratorWidget(Portfolio currentPortfolio) {
+    this.currentPortfolio = currentPortfolio;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

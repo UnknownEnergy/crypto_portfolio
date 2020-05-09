@@ -71,7 +71,7 @@ class PortfolioOverviewWidget extends StatelessWidget {
             onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ManagePortfolioWidget())),
+                    builder: (context) => ManagePortfolioWidget(null))),
           ),
           SpeedDialChild(
             child: Icon(Icons.camera_alt),
