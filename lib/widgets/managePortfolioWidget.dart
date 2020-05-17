@@ -58,40 +58,9 @@ class ManagePortfolioWidget extends StatelessWidget {
                 RaisedButton(
                   onPressed: () {
                     if (currentPortfolio != null) {
-                      currentPortfolio.name = portfolioNameController.text;
-                      currentPortfolio.description =
-                          portfolioDescController.text;
-                      new PortfolioDatabaseService()
-                          .updatePortfolio(currentPortfolio);
-                      new PortfolioCoinDatabaseService()
-                          .getAllPortfolioCoins()
-                          .then((portfolioCoins) {
-                        portfolioCoins
-                            .where((portfolioCoin) =>
-                                portfolioCoin.portfolioId ==
-                                currentPortfolio.id)
-                            .forEach((portfolioCoin) {
-//                              portfolioCoin.percent = double.parse(percentController.text);
-//                          new PortfolioCoinDatabaseService()
-//                              .updatePortfolioCoin(portfolioCoin);
-                        });
-                      });
+                      updateOldPortfolio();
                     } else {
-                      //TODO hardcoded userId
-                      new PortfolioDatabaseService()
-                          .addPortfolio(new Portfolio(
-                              "",
-                              portfolioNameController.text,
-                              portfolioDescController.text,
-                              "1234"))
-                          .then((documentReference) {
-                        new PortfolioCoinDatabaseService().addPortfolioCoin(
-                            new PortfolioCoin(
-                                "",
-                                dropdownKey,
-                                documentReference.documentID,
-                                double.parse(percentController.text)));
-                      });
+                      createNewPortfolio();
                     }
                     Navigator.pop(context);
                   },
@@ -132,6 +101,44 @@ class ManagePortfolioWidget extends StatelessWidget {
                 ),
               ])),
     ));
+  }
+
+  void updateOldPortfolio() {
+    currentPortfolio.name = portfolioNameController.text;
+    currentPortfolio.description =
+        portfolioDescController.text;
+    new PortfolioDatabaseService()
+        .updatePortfolio(currentPortfolio);
+    new PortfolioCoinDatabaseService()
+        .getAllPortfolioCoins()
+        .then((portfolioCoins) {
+      portfolioCoins
+          .where((portfolioCoin) =>
+              portfolioCoin.portfolioId ==
+              currentPortfolio.id)
+          .forEach((portfolioCoin) {
+    //                              portfolioCoin.percent = double.parse(percentController.text);
+    //                          new PortfolioCoinDatabaseService()
+    //                              .updatePortfolioCoin(portfolioCoin);
+      });
+    });
+  }
+
+  void createNewPortfolio() {
+    new PortfolioDatabaseService()
+        .addPortfolio(new Portfolio(
+            "",
+            portfolioNameController.text,
+            portfolioDescController.text,
+            user.id))
+        .then((documentReference) {
+      new PortfolioCoinDatabaseService().addPortfolioCoin(
+          new PortfolioCoin(
+              "",
+              dropdownKey,
+              documentReference.documentID,
+              double.parse(percentController.text)));
+    });
   }
 }
 
