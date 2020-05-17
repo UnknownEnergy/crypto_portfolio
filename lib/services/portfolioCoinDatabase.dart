@@ -40,6 +40,14 @@ class PortfolioCoinDatabaseService {
         .first;
   }
 
+  Future<List<PortfolioCoin>> getAllPortfolioCoinsOfPortfolio(
+      String portfolioId) async {
+    var portfolioCoins = await getAllPortfolioCoins();
+    return portfolioCoins
+        .where((portfolioCoin) => portfolioCoin.portfolioId == portfolioId)
+        .toList();
+  }
+
   Future<List<PortfolioCoin>> getAllPortfolioCoinsOfUser(String userId) async {
     List<PortfolioCoin> portfolioCoins = new List<PortfolioCoin>();
 

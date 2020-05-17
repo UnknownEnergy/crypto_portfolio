@@ -10,13 +10,29 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 
-class ManagePortfolioWidget extends StatelessWidget {
-  TextEditingController portfolioNameController = new TextEditingController();
-  TextEditingController portfolioDescController = new TextEditingController();
+class ManagePortfolioWidget extends StatefulWidget {
   Portfolio currentPortfolio;
   User user;
 
   ManagePortfolioWidget(Portfolio currentPortfolio, User user) {
+    this.currentPortfolio = currentPortfolio;
+    this.user = user;
+  }
+
+  @override
+  _ManagePortfolioWidgetState createState() {
+    return _ManagePortfolioWidgetState(currentPortfolio, user);
+  }
+}
+
+class _ManagePortfolioWidgetState extends State<ManagePortfolioWidget> {
+  TextEditingController portfolioNameController = new TextEditingController();
+  TextEditingController portfolioDescController = new TextEditingController();
+  Portfolio currentPortfolio;
+  User user;
+  List<PortfolioCoin> portfolioCoins = new List<PortfolioCoin>();
+
+  _ManagePortfolioWidgetState(Portfolio currentPortfolio, User user) {
     this.currentPortfolio = currentPortfolio;
     this.user = user;
 
@@ -28,15 +44,13 @@ class ManagePortfolioWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: DefaultTabController(
-      length: 2,
-      child: Scaffold(
-          appBar: AppBar(
-            title: Text('Manage Portfolio'),
-          ),
-          body: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
+            length: 2,
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text('Manage Portfolio'),
+              ),
+              body: SingleChildScrollView(
+                  child: Column(children: [
                 TextField(
                   obscureText: false,
                   controller: portfolioNameController,
@@ -54,72 +68,87 @@ class ManagePortfolioWidget extends StatelessWidget {
                     labelText: 'Portfolio Description',
                   ),
                 ),
-                buildCoinList(),
+                createFutureBuilderOfPortfolioCoins(),
+                    RaisedButton(
+                      onPressed: () async {
+                        var coins = await new CoinDatabaseService().getAllCoins();
+                        Coin defaultCoin = coins.where((coin)=>coin.name == 'Bitcoin').first;
+                        portfolioCoins.add(new PortfolioCoin('', defaultCoin.id, currentPortfolio.id, 0));
+                        (context as Element).reassemble();
+                      },
+                      child: Text('Add Coin'),
+                    ),
                 RaisedButton(
                   onPressed: () {
-                    if (currentPortfolio != null) {
-                      updateOldPortfolio();
-                    } else {
-                      createNewPortfolio();
-                    }
-                    (context as Element).reassemble();
-                    Navigator.pop(context);
+                    onSaveButton(context);
                   },
                   child: Text('Save'),
                 ),
                 RaisedButton(
                   onPressed: () async {
-                    if (currentPortfolio != null) {
-                      await new PortfolioDatabaseService()
-                          .deletePortfolio(currentPortfolio.id);
-                      await new PortfolioCoinDatabaseService()
-                          .getAllPortfolioCoins()
-                          .then((portfolioCoins) {
-                        portfolioCoins
-                            .where((portfolioCoin) =>
-                                portfolioCoin.portfolioId ==
-                                currentPortfolio.id)
-                            .forEach((portfolioCoin) {
-                          new PortfolioCoinDatabaseService()
-                              .deletePortfolioCoin(portfolioCoin.id);
-                        });
-                      });
-                    }
-                    (context as Element).reassemble();
-                    Navigator.pop(context);
+                    await onDeleteButton(context);
                   },
                   child: Text('Delete'),
                 ),
                 RaisedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              ModeratorWidget(currentPortfolio, user)),
-                    );
+                    onManageModsButton(context);
                   },
                   child: Text('Manage Moderators'),
                 ),
               ])),
-    ));
+            )));
+  }
+
+  void onManageModsButton(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ModeratorWidget(currentPortfolio, user)),
+    );
+  }
+
+  void onSaveButton(BuildContext context) {
+    if (currentPortfolio.id.isNotEmpty) {
+      updateOldPortfolio();
+    } else {
+      createNewPortfolio();
+    }
+    (context as Element).reassemble();
+    Navigator.pop(context);
+  }
+
+  Future onDeleteButton(BuildContext context) async {
+    if (currentPortfolio != null) {
+      await new PortfolioDatabaseService().deletePortfolio(currentPortfolio.id);
+      await new PortfolioCoinDatabaseService()
+          .getAllPortfolioCoins()
+          .then((portfolioCoins) {
+        portfolioCoins
+            .where((portfolioCoin) =>
+                portfolioCoin.portfolioId == currentPortfolio.id)
+            .forEach((portfolioCoin) {
+          new PortfolioCoinDatabaseService()
+              .deletePortfolioCoin(portfolioCoin.id);
+        });
+      });
+    }
+    (context as Element).reassemble();
+    Navigator.pop(context);
   }
 
   Future<void> updateOldPortfolio() async {
     currentPortfolio.name = portfolioNameController.text;
     currentPortfolio.description = portfolioDescController.text;
     await new PortfolioDatabaseService().updatePortfolio(currentPortfolio);
-    await new PortfolioCoinDatabaseService()
-        .getAllPortfolioCoins()
-        .then((portfolioCoins) {
-      portfolioCoins
-          .where((portfolioCoin) =>
-              portfolioCoin.portfolioId == currentPortfolio.id)
-          .forEach((portfolioCoin) {
-        //                              portfolioCoin.percent = double.parse(percentController.text);
-        //                          new PortfolioCoinDatabaseService()
-        //                              .updatePortfolioCoin(portfolioCoin);
-      });
+    portfolioCoins.forEach((portfolioCoin) async {
+      if(portfolioCoin.id.isEmpty) {
+        await new PortfolioCoinDatabaseService()
+            .addPortfolioCoin(portfolioCoin);
+      } else {
+        await new PortfolioCoinDatabaseService()
+            .updatePortfolioCoin(portfolioCoin);
+      }
     });
   }
 
@@ -128,59 +157,90 @@ class ManagePortfolioWidget extends StatelessWidget {
         .addPortfolio(new Portfolio("", portfolioNameController.text,
             portfolioDescController.text, user.id))
         .then((documentReference) async {
-    await new PortfolioCoinDatabaseService().addPortfolioCoin(new PortfolioCoin(
-          "",
-          dropdownKey,
-          documentReference.documentID,
-          double.parse(percentController.text)));
+      portfolioCoins.forEach((portfolioCoin) async {
+        portfolioCoin.portfolioId = documentReference.documentID;
+        await new PortfolioCoinDatabaseService()
+            .addPortfolioCoin(portfolioCoin);
+      });
     });
   }
-}
 
-String dropdownValue = 'Bitcoin';
-String dropdownKey = '';
-TextEditingController percentController = new TextEditingController();
+  FutureBuilder<List<PortfolioCoin>> createFutureBuilderOfPortfolioCoins() {
+    return FutureBuilder(
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.none || snap.data == null) {
+          return Column();
+        }
+        List<PortfolioCoin> dbPortfolioCoins = snap.data;
+        dbPortfolioCoins.forEach((dbPortfolioCoin) {
+          if(!portfolioCoins.any((portfolioCoin)=>portfolioCoin.id == dbPortfolioCoin.id)){
+            portfolioCoins.add(dbPortfolioCoin);
+          }
+        });
 
-FutureBuilder<List<Coin>> buildCoinList() {
-  return FutureBuilder(
-    builder: (context, snap) {
-      if (snap.connectionState == ConnectionState.none || snap.data == null) {
-        return DropdownButton(
-          items: <DropdownMenuItem>[],
-          onChanged: (value) {},
-        );
-      }
-      List<Coin> coins = snap.data;
+        List<Column> columns = new List<Column>();
+        portfolioCoins.forEach((portfolioCoin) {
+          createEachPortfolioColumn(portfolioCoin, columns);
+        });
 
-      return Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            SearchableDropdown.single(
-              items: coins.toList().map<DropdownMenuItem<Coin>>((Coin coin) {
-                return DropdownMenuItem<Coin>(
-                  value: coin,
-                  child: Text(coin.name),
-                );
-              }).toList(),
-              value: dropdownValue,
-              hint: "Select one",
-              searchHint: "Select one",
-              onChanged: (Coin coin) {
-                dropdownValue = coin.name;
-                dropdownKey = coin.id;
+        return Column(children: columns);
+      },
+      future: new PortfolioCoinDatabaseService()
+          .getAllPortfolioCoinsOfPortfolio(currentPortfolio.id),
+    );
+  }
+
+  Future<void> createEachPortfolioColumn(PortfolioCoin portfolioCoin, List<Column> columns) async {
+    TextEditingController percentController = new TextEditingController();
+    percentController.text = portfolioCoin.percent.toString();
+
+//    var coin = await new CoinDatabaseService().getCoin(portfolioCoin.coinId);
+    
+    columns.add(Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          //TODO preselect not working?
+          createSearchableCoinFutureBuilder('Bitcoin', (Coin coin){
+            portfolioCoin.coinId = coin.id;
+          }),
+          TextField(
+              obscureText: false,
+              controller: percentController,
+              onChanged: (percent) {
+                portfolioCoin.percent = double.parse(percent);
               },
-              isExpanded: true,
-            ),
-            TextField(
-                obscureText: false,
-                controller: percentController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Coin Percent',
-                )),
-          ]);
-    },
-    future: new CoinDatabaseService().getAllCoins(),
-  );
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Coin Percent',
+              )),
+        ]));
+  }
+
+  FutureBuilder<List<Coin>> createSearchableCoinFutureBuilder(String preSelectedValue,
+      Function onCoinChange) {
+    return FutureBuilder(
+        builder: (context, snap) {
+          if (snap.connectionState == ConnectionState.none || snap.data == null) {
+            return Column();
+          }
+
+          List<Coin> coins = snap.data;
+          return SearchableDropdown.single(
+            items: coins.toList().map<DropdownMenuItem<Coin>>((Coin coin) {
+              return DropdownMenuItem<Coin>(
+                value: coin,
+                child: Text(coin.name),
+              );
+            }).toList(),
+            //TODO preselect not working?
+            value: preSelectedValue,
+            hint: 'Select one',
+            searchHint: 'Select one',
+            onChanged: onCoinChange,
+            isExpanded: true,
+          );
+        },
+        future: new CoinDatabaseService().getAllCoins());
+  }
 }
