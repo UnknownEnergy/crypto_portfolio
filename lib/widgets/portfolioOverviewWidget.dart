@@ -1,5 +1,7 @@
+import 'package:crypto_portfolio/models/moderator.dart';
 import 'package:crypto_portfolio/models/portfolio.dart';
 import 'package:crypto_portfolio/models/user.dart';
+import 'package:crypto_portfolio/services/moderatorDatabase.dart';
 import 'package:crypto_portfolio/services/portfolioDatabase.dart';
 import 'package:crypto_portfolio/widgets/portfolioWidget.dart';
 import 'package:flutter/cupertino.dart';
@@ -36,7 +38,8 @@ class PortfolioOverviewWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text(portfolio.name + getOwnPortfolioText(portfolio, user)),
+                      Text(portfolio.name +
+                          getOwnPortfolioText(portfolio, user)),
                       buildStarRating(portfolio.id),
                     ]),
                 onTap: () => {
@@ -83,13 +86,19 @@ class PortfolioOverviewWidget extends StatelessWidget {
             backgroundColor: Colors.blue,
             label: 'Scan QR Code',
             onTap: () async => {
-              portfolioId = await scanner.scan(),
+              onScanQr(user.id, portfolioId),
             },
           ),
         ],
       ),
     );
   }
+}
+
+Future<void> onScanQr(String userId, String portfolioId) async {
+  String portfolioId = await scanner.scan();
+  new ModeratorDatabaseService()
+      .addModerator(new Moderator("", userId, portfolioId));
 }
 
 String getOwnPortfolioText(Portfolio portfolio, User user) {
