@@ -1,17 +1,21 @@
 import 'package:crypto_portfolio/models/portfolio.dart';
-import 'package:crypto_portfolio/models/rating.dart';
+import 'package:crypto_portfolio/models/user.dart';
 import 'package:crypto_portfolio/services/portfolioDatabase.dart';
-import 'package:crypto_portfolio/services/ratingDatabase.dart';
 import 'package:crypto_portfolio/widgets/portfolioWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
-import 'package:smooth_star_rating/smooth_star_rating.dart';
 
 import 'managePortfolioWidget.dart';
 
 class PortfolioOverviewWidget extends StatelessWidget {
+  User user;
+
+  PortfolioOverviewWidget(User user) {
+    this.user = user;
+  }
+
   @override
   Widget build(BuildContext context) {
     String portfolioId;
@@ -32,14 +36,15 @@ class PortfolioOverviewWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text(portfolio.name),
+                      Text(portfolio.name + getOwnPortfolioText(portfolio, user)),
                       buildStarRating(portfolio.id),
                     ]),
                 onTap: () => {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => PortfolioWidget(portfolio))),
+                          builder: (context) =>
+                              PortfolioWidget(portfolio, user))),
                 },
               );
             },
@@ -71,7 +76,7 @@ class PortfolioOverviewWidget extends StatelessWidget {
             onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ManagePortfolioWidget(null))),
+                    builder: (context) => ManagePortfolioWidget(null, user))),
           ),
           SpeedDialChild(
             child: Icon(Icons.camera_alt),
@@ -85,4 +90,11 @@ class PortfolioOverviewWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+String getOwnPortfolioText(Portfolio portfolio, User user) {
+  if (portfolio.ownerUserId == user.id) {
+    return ' - Own Portfolio';
+  }
+  return '';
 }

@@ -1,9 +1,16 @@
+import 'package:crypto_portfolio/models/user.dart';
 import 'package:crypto_portfolio/widgets/dashboardWidget.dart';
 import 'package:crypto_portfolio/widgets/portfolioOverviewWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class HomeWidget extends StatelessWidget {
+  User user;
+
+  HomeWidget(User user) {
+    this.user = user;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,8 +28,8 @@ class HomeWidget extends StatelessWidget {
           ),
           body: TabBarView(
             children: [
-              DashboardWidget(),
-              PortfolioOverviewWidget(),
+              DashboardWidget(user),
+              PortfolioOverviewWidget(user),
             ],
           ),
         ),

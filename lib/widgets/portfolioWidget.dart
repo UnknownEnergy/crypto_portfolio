@@ -2,6 +2,7 @@ import 'package:crypto_portfolio/models/coin.dart';
 import 'package:crypto_portfolio/models/portfolio.dart';
 import 'package:crypto_portfolio/models/portfolioCoin.dart';
 import 'package:crypto_portfolio/models/rating.dart';
+import 'package:crypto_portfolio/models/user.dart';
 import 'package:crypto_portfolio/services/coinDatabase.dart';
 import 'package:crypto_portfolio/services/portfolioCoinDatabase.dart';
 import 'package:crypto_portfolio/services/ratingDatabase.dart';
@@ -14,9 +15,11 @@ import 'package:smooth_star_rating/smooth_star_rating.dart';
 
 class PortfolioWidget extends StatelessWidget {
   Portfolio portfolio;
+  User user;
 
-  PortfolioWidget(Portfolio portfolio) {
+  PortfolioWidget(Portfolio portfolio, User user) {
     this.portfolio = portfolio;
+    this.user = user;
   }
 
   @override
@@ -47,7 +50,8 @@ class PortfolioWidget extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ManagePortfolioWidget(portfolio)));
+                          builder: (context) =>
+                              ManagePortfolioWidget(portfolio, user)));
                 },
                 child: Icon(Icons.edit),
                 backgroundColor: Colors.red,
@@ -107,17 +111,19 @@ FutureBuilder<List<Rating>> buildStarRating(String portfolioId) {
       } else if (portfolioRatings.length == 0) {
         starCounter = 0;
       } else {
-        starCounter = portfolioRatings.reduce((a, b) => a + b) /
-            portfolioRatings.length;
+        starCounter =
+            portfolioRatings.reduce((a, b) => a + b) / portfolioRatings.length;
       }
       return SmoothStarRating(
           allowHalfRating: false,
           starCount: 5,
           rating: starCounter,
           onRatingChanged: (stars) {
-            _showDialog(context,"Voted!", "You voted with "+ stars.toString() + " stars");
+            _showDialog(context, "Voted!",
+                "You voted with " + stars.toString() + " stars");
             //TODO userID hardcoded
-            new RatingDatabaseService().addRating(new Rating("", "8OVUysbfvuvM9HLDZ5bT", portfolioId, stars));
+            new RatingDatabaseService().addRating(
+                new Rating("", "8OVUysbfvuvM9HLDZ5bT", portfolioId, stars));
           },
           filledIconData: Icons.star,
           halfFilledIconData: Icons.star_half,
@@ -126,7 +132,6 @@ FutureBuilder<List<Rating>> buildStarRating(String portfolioId) {
     future: new RatingDatabaseService().getAllRatings(),
   );
 }
-
 
 void _showDialog(BuildContext context, String title, String message) {
   showDialog(

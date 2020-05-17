@@ -1,6 +1,7 @@
 import 'package:crypto_portfolio/models/coin.dart';
 import 'package:crypto_portfolio/models/portfolio.dart';
 import 'package:crypto_portfolio/models/portfolioCoin.dart';
+import 'package:crypto_portfolio/models/user.dart';
 import 'package:crypto_portfolio/services/coinDatabase.dart';
 import 'package:crypto_portfolio/services/portfolioCoinDatabase.dart';
 import 'package:crypto_portfolio/services/portfolioDatabase.dart';
@@ -13,9 +14,11 @@ class ManagePortfolioWidget extends StatelessWidget {
   TextEditingController portfolioNameController = new TextEditingController();
   TextEditingController portfolioDescController = new TextEditingController();
   Portfolio currentPortfolio;
+  User user;
 
-  ManagePortfolioWidget(Portfolio currentPortfolio) {
+  ManagePortfolioWidget(Portfolio currentPortfolio, User user) {
     this.currentPortfolio = currentPortfolio;
+    this.user = user;
 
     portfolioNameController.text = currentPortfolio?.name ?? " ";
     portfolioDescController.text = currentPortfolio?.description ?? " ";
@@ -122,7 +125,7 @@ class ManagePortfolioWidget extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              ModeratorWidget(currentPortfolio)),
+                              ModeratorWidget(currentPortfolio, user)),
                     );
                   },
                   child: Text('Manage Moderators'),
