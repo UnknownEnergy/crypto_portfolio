@@ -62,16 +62,17 @@ class ManagePortfolioWidget extends StatelessWidget {
                     } else {
                       createNewPortfolio();
                     }
+                    (context as Element).reassemble();
                     Navigator.pop(context);
                   },
                   child: Text('Save'),
                 ),
                 RaisedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (currentPortfolio != null) {
-                      new PortfolioDatabaseService()
+                      await new PortfolioDatabaseService()
                           .deletePortfolio(currentPortfolio.id);
-                      new PortfolioCoinDatabaseService()
+                      await new PortfolioCoinDatabaseService()
                           .getAllPortfolioCoins()
                           .then((portfolioCoins) {
                         portfolioCoins
@@ -84,6 +85,7 @@ class ManagePortfolioWidget extends StatelessWidget {
                         });
                       });
                     }
+                    (context as Element).reassemble();
                     Navigator.pop(context);
                   },
                   child: Text('Delete'),
@@ -103,41 +105,34 @@ class ManagePortfolioWidget extends StatelessWidget {
     ));
   }
 
-  void updateOldPortfolio() {
+  Future<void> updateOldPortfolio() async {
     currentPortfolio.name = portfolioNameController.text;
-    currentPortfolio.description =
-        portfolioDescController.text;
-    new PortfolioDatabaseService()
-        .updatePortfolio(currentPortfolio);
-    new PortfolioCoinDatabaseService()
+    currentPortfolio.description = portfolioDescController.text;
+    await new PortfolioDatabaseService().updatePortfolio(currentPortfolio);
+    await new PortfolioCoinDatabaseService()
         .getAllPortfolioCoins()
         .then((portfolioCoins) {
       portfolioCoins
           .where((portfolioCoin) =>
-              portfolioCoin.portfolioId ==
-              currentPortfolio.id)
+              portfolioCoin.portfolioId == currentPortfolio.id)
           .forEach((portfolioCoin) {
-    //                              portfolioCoin.percent = double.parse(percentController.text);
-    //                          new PortfolioCoinDatabaseService()
-    //                              .updatePortfolioCoin(portfolioCoin);
+        //                              portfolioCoin.percent = double.parse(percentController.text);
+        //                          new PortfolioCoinDatabaseService()
+        //                              .updatePortfolioCoin(portfolioCoin);
       });
     });
   }
 
-  void createNewPortfolio() {
-    new PortfolioDatabaseService()
-        .addPortfolio(new Portfolio(
-            "",
-            portfolioNameController.text,
-            portfolioDescController.text,
-            user.id))
-        .then((documentReference) {
-      new PortfolioCoinDatabaseService().addPortfolioCoin(
-          new PortfolioCoin(
-              "",
-              dropdownKey,
-              documentReference.documentID,
-              double.parse(percentController.text)));
+  Future<void> createNewPortfolio() async {
+    await new PortfolioDatabaseService()
+        .addPortfolio(new Portfolio("", portfolioNameController.text,
+            portfolioDescController.text, user.id))
+        .then((documentReference) async {
+    await new PortfolioCoinDatabaseService().addPortfolioCoin(new PortfolioCoin(
+          "",
+          dropdownKey,
+          documentReference.documentID,
+          double.parse(percentController.text)));
     });
   }
 }

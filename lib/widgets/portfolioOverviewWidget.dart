@@ -86,7 +86,7 @@ class PortfolioOverviewWidget extends StatelessWidget {
             backgroundColor: Colors.blue,
             label: 'Scan QR Code',
             onTap: () async => {
-              onScanQr(user.id, portfolioId),
+              onScanQr(user.id, portfolioId, context),
             },
           ),
         ],
@@ -95,10 +95,11 @@ class PortfolioOverviewWidget extends StatelessWidget {
   }
 }
 
-Future<void> onScanQr(String userId, String portfolioId) async {
+Future<void> onScanQr(String userId, String portfolioId, BuildContext context) async {
   String portfolioId = await scanner.scan();
-  new ModeratorDatabaseService()
+  await new ModeratorDatabaseService()
       .addModerator(new Moderator("", userId, portfolioId));
+  (context as Element).reassemble();
 }
 
 String getOwnPortfolioText(Portfolio portfolio, User user) {
