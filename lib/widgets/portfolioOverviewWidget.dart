@@ -40,7 +40,7 @@ class PortfolioOverviewWidget extends StatelessWidget {
                     children: <Widget>[
                       Text(portfolio.name +
                           getOwnPortfolioText(portfolio, user)),
-                      buildStarRating(portfolio.id),
+                      buildStarRating(user.id, portfolio.id),
                     ]),
                 onTap: () => {
                   Navigator.push(

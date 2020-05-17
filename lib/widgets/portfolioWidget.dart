@@ -37,8 +37,8 @@ class PortfolioWidget extends StatelessWidget {
                   children: <Widget>[
                     Text(portfolio.name),
                     Text(portfolio.description),
-                    buildPortfolioChart(this.portfolio.id),
-                    buildStarRating(this.portfolio.id),
+                    buildPortfolioChart(portfolio.id),
+                    buildStarRating(user.id, portfolio.id),
                     QrImage(
                       data: portfolio.id,
                       version: QrVersions.auto,
@@ -92,7 +92,7 @@ class PortfolioWidget extends StatelessWidget {
   }
 }
 
-FutureBuilder<List<Rating>> buildStarRating(String portfolioId) {
+FutureBuilder<List<Rating>> buildStarRating(String userId, String portfolioId) {
   return FutureBuilder(
     builder: (context, snap) {
       if (snap.connectionState == ConnectionState.none || snap.data == null) {
@@ -118,12 +118,11 @@ FutureBuilder<List<Rating>> buildStarRating(String portfolioId) {
           allowHalfRating: false,
           starCount: 5,
           rating: starCounter,
-          onRatingChanged: (stars) {
+          onRatingChanged: (stars) async {
+            await new RatingDatabaseService().addRating(
+                new Rating("", userId, portfolioId, stars));
             _showDialog(context, "Voted!",
                 "You voted with " + stars.toString() + " stars");
-            //TODO userID hardcoded
-            new RatingDatabaseService().addRating(
-                new Rating("", "8OVUysbfvuvM9HLDZ5bT", portfolioId, stars));
           },
           filledIconData: Icons.star,
           halfFilledIconData: Icons.star_half,
@@ -144,6 +143,7 @@ void _showDialog(BuildContext context, String title, String message) {
           new FlatButton(
             child: new Text("Close"),
             onPressed: () {
+              (context as Element).reassemble();
               Navigator.of(context).pop();
             },
           ),
