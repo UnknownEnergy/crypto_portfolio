@@ -39,15 +39,15 @@ class ModeratorDatabaseService {
   }
 
   Future<bool> checkIfUserIsModeratorOfPortfolio(
-      User user, Portfolio portfolio) {
+      String userId, String portfolioId) {
     return moderatorCollection
         .getDocuments()
         .asStream()
         .map((snap) => snap.documents
             .map((doc) => Moderator.fromFirestore(doc))
             .any((moderator) =>
-                moderator.portfolioId == portfolio.id &&
-                moderator.userId == user.id))
+                moderator.portfolioId == portfolioId &&
+                moderator.userId == userId))
         .first;
   }
 }

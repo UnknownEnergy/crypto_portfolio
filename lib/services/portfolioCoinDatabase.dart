@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto_portfolio/models/portfolioCoin.dart';
+import 'package:crypto_portfolio/services/portfolioDatabase.dart';
+
+import 'moderatorDatabase.dart';
 
 class PortfolioCoinDatabaseService {
   final CollectionReference portfolioCoinCollection =
@@ -35,5 +38,20 @@ class PortfolioCoinDatabaseService {
             .map((doc) => PortfolioCoin.fromFirestore(doc))
             .toList())
         .first;
+  }
+
+  Future<List<PortfolioCoin>> getAllPortfolioCoinsOfUser(String userId) async {
+    List<PortfolioCoin> portfolioCoins = new List<PortfolioCoin>();
+
+    for (PortfolioCoin portfolioCoin in await getAllPortfolioCoins()) {
+      bool isModerator = await new ModeratorDatabaseService()
+          .checkIfUserIsModeratorOfPortfolio(userId, portfolioCoin.portfolioId);
+      bool isOwner = await new PortfolioDatabaseService()
+          .isOwner(portfolioCoin.portfolioId, userId);
+      if (isModerator || isOwner) {
+        portfolioCoins.add(portfolioCoin);
+      }
+    }
+    return portfolioCoins;
   }
 }

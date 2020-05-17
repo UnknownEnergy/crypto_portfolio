@@ -20,13 +20,13 @@ class DashboardWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Text("Dashboard of "+user.email),
-          buildDashboardChart(),
+          Text("Dashboard of " + user.email),
+          buildDashboardChart(user),
         ]);
   }
 }
 
-FutureBuilder<List<dynamic>> buildDashboardChart() {
+FutureBuilder<List<dynamic>> buildDashboardChart(User user) {
   return FutureBuilder(
     builder: (context, AsyncSnapshot<List<dynamic>> snap) {
       if (snap.connectionState == ConnectionState.none ||
@@ -35,9 +35,7 @@ FutureBuilder<List<dynamic>> buildDashboardChart() {
         return Container();
       }
       Map<String, double> dataMap = new Map();
-      List<PortfolioCoin> portfolioCoins = snap.data[0]
-//          .where((portfolioCoin) => portfolioCoin.portfolioId == portfolioId)
-          .toList();
+      List<PortfolioCoin> portfolioCoins = snap.data[0].toList();
 
       if (portfolioCoins.length == 0) {
         dataMap.putIfAbsent("None", () => 100);
@@ -65,7 +63,7 @@ FutureBuilder<List<dynamic>> buildDashboardChart() {
       return PieChart(dataMap: dataMap);
     },
     future: Future.wait([
-      new PortfolioCoinDatabaseService().getAllPortfolioCoins(),
+      new PortfolioCoinDatabaseService().getAllPortfolioCoinsOfUser(user.id),
       new CoinDatabaseService().getAllCoins()
     ]),
   );

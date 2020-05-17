@@ -43,12 +43,17 @@ class PortfolioDatabaseService {
 
     for (Portfolio portfolio in await getAllPortfolios()) {
       bool isModerator = await new ModeratorDatabaseService()
-          .checkIfUserIsModeratorOfPortfolio(user, portfolio);
+          .checkIfUserIsModeratorOfPortfolio(user.id, portfolio.id);
       if (isModerator || portfolio.ownerUserId == user.id) {
         portfolios.add(portfolio);
       }
     }
 
     return portfolios;
+  }
+
+  Future<bool> isOwner(String portfolioId, String userId) async {
+    Portfolio portfolio = await getPortfolio(portfolioId);
+    return portfolio.ownerUserId == userId;
   }
 }
