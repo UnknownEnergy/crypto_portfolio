@@ -3,34 +3,37 @@ import 'package:crypto_portfolio/models/moderatorRole.dart';
 
 class ModeratorRoleDatabaseService {
   final CollectionReference moderatorRoleCollection =
-  Firestore.instance.collection('moderatorRole');
+      Firestore.instance.collection('moderatorRole');
 
-  Future addModeratorRole(ModeratorRole moderatorRole) async {
-    return await moderatorRoleCollection.add(moderatorRole.toMap());
+  Future addModeratorRole(ModeratorRole moderatorRole) {
+    return moderatorRoleCollection.add(moderatorRole.toMap());
   }
 
-  Future<void> updateModeratorRole(ModeratorRole moderatorRole) async {
-    return await moderatorRoleCollection.document(moderatorRole.id).setData(moderatorRole.toMap());
+  Future<void> updateModeratorRole(ModeratorRole moderatorRole) {
+    return moderatorRoleCollection
+        .document(moderatorRole.id)
+        .setData(moderatorRole.toMap());
   }
 
-  Future<ModeratorRole> getModeratorRole(String id) async {
-    return await moderatorRoleCollection
+  Future<ModeratorRole> getModeratorRole(String id) {
+    return moderatorRoleCollection
         .document(id)
         .snapshots()
         .map((snap) => ModeratorRole.fromFirestore(snap))
         .first;
   }
 
-  Future<void> deleteModeratorRole(String id) async {
-    return await moderatorRoleCollection.document(id).delete();
+  Future<void> deleteModeratorRole(String id) {
+    return moderatorRoleCollection.document(id).delete();
   }
 
-  Future<List<ModeratorRole>> getAllModeratorRoles() async {
-    return await moderatorRoleCollection
+  Future<List<ModeratorRole>> getAllModeratorRoles() {
+    return moderatorRoleCollection
         .getDocuments()
         .asStream()
-        .map((snap) =>
-            snap.documents.map((doc) => ModeratorRole.fromFirestore(doc)).toList())
+        .map((snap) => snap.documents
+            .map((doc) => ModeratorRole.fromFirestore(doc))
+            .toList())
         .first;
   }
 }

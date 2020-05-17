@@ -3,30 +3,30 @@ import 'package:crypto_portfolio/models/rating.dart';
 
 class RatingDatabaseService {
   final CollectionReference ratingCollection =
-  Firestore.instance.collection('rating');
+      Firestore.instance.collection('rating');
 
-  Future addRating(Rating rating) async {
-    return await ratingCollection.add(rating.toMap());
+  Future addRating(Rating rating) {
+    return ratingCollection.add(rating.toMap());
   }
 
-  Future<void> updateRating(Rating rating) async {
-    return await ratingCollection.document(rating.id).setData(rating.toMap());
+  Future<void> updateRating(Rating rating) {
+    return ratingCollection.document(rating.id).setData(rating.toMap());
   }
 
-  Future<Rating> getRating(String id) async {
-    return await ratingCollection
+  Future<Rating> getRating(String id) {
+    return ratingCollection
         .document(id)
         .snapshots()
         .map((snap) => Rating.fromFirestore(snap))
         .first;
   }
 
-  Future<void> deleteRating(String id) async {
-    return await ratingCollection.document(id).delete();
+  Future<void> deleteRating(String id) {
+    return ratingCollection.document(id).delete();
   }
 
-  Future<List<Rating>> getAllRatings() async {
-    return await ratingCollection
+  Future<List<Rating>> getAllRatings() {
+    return ratingCollection
         .getDocuments()
         .asStream()
         .map((snap) =>

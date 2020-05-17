@@ -50,7 +50,7 @@ class PortfolioOverviewWidget extends StatelessWidget {
             },
           );
         },
-        future: new PortfolioDatabaseService().getAllPortfolios(),
+        future: new PortfolioDatabaseService().getAllPortfoliosOfUser(user),
       )),
       floatingActionButton: SpeedDial(
         animatedIcon: AnimatedIcons.menu_close,

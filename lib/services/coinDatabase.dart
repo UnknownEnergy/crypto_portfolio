@@ -3,30 +3,30 @@ import 'package:crypto_portfolio/models/coin.dart';
 
 class CoinDatabaseService {
   final CollectionReference coinCollection =
-  Firestore.instance.collection('coin');
+      Firestore.instance.collection('coin');
 
-  Future addCoin(Coin coin) async {
-    return await coinCollection.add(coin.toMap());
+  Future addCoin(Coin coin) {
+    return coinCollection.add(coin.toMap());
   }
 
-  Future<void> updateCoin(Coin coin) async {
-    return await coinCollection.document(coin.id).setData(coin.toMap());
+  Future<void> updateCoin(Coin coin) {
+    return coinCollection.document(coin.id).setData(coin.toMap());
   }
 
-  Future<Coin> getCoin(String id) async {
-    return await coinCollection
+  Future<Coin> getCoin(String id) {
+    return coinCollection
         .document(id)
         .snapshots()
         .map((snap) => Coin.fromFirestore(snap))
         .first;
   }
 
-  Future<void> deleteCoin(String id) async {
-    return await coinCollection.document(id).delete();
+  Future<void> deleteCoin(String id) {
+    return coinCollection.document(id).delete();
   }
 
-  Future<List<Coin>> getAllCoins() async {
-    return await coinCollection
+  Future<List<Coin>> getAllCoins() {
+    return coinCollection
         .getDocuments()
         .asStream()
         .map((snap) =>

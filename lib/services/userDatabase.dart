@@ -5,28 +5,28 @@ class UserDatabaseService {
   final CollectionReference userCollection =
       Firestore.instance.collection('user');
 
-  Future addUser(User user) async {
-    return await userCollection.add(user.toMap());
+  Future addUser(User user) {
+    return userCollection.add(user.toMap());
   }
 
-  Future<void> updateUser(User user) async {
-    return await userCollection.document(user.id).setData(user.toMap());
+  Future<void> updateUser(User user) {
+    return userCollection.document(user.id).setData(user.toMap());
   }
 
-  Future<User> getUser(String id) async {
-    return await userCollection
+  Future<User> getUser(String id) {
+    return userCollection
         .document(id)
         .snapshots()
         .map((snap) => User.fromFirestore(snap))
         .first;
   }
 
-  Future<void> deleteUser(String id) async {
-    return await userCollection.document(id).delete();
+  Future<void> deleteUser(String id) {
+    return userCollection.document(id).delete();
   }
 
-  Future<List<User>> getAllUsers() async {
-    return await userCollection
+  Future<List<User>> getAllUsers() {
+    return userCollection
         .getDocuments()
         .asStream()
         .map((snap) =>
