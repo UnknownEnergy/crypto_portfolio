@@ -35,8 +35,18 @@ class PortfolioWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(portfolio.name),
-                    Text(portfolio.description),
+                    Text(
+                      portfolio.name,
+                      style: new TextStyle(
+                        fontSize: 25.0,
+                      ),
+                    ),
+                    Text(
+                      portfolio.description,
+                      style: new TextStyle(
+                        fontSize: 15.0,
+                      ),
+                    ),
                     buildPortfolioChart(portfolio.id),
                     buildStarRating(user.id, portfolio.id),
                     QrImage(
@@ -119,8 +129,8 @@ FutureBuilder<List<Rating>> buildStarRating(String userId, String portfolioId) {
           starCount: 5,
           rating: starCounter,
           onRatingChanged: (stars) async {
-            await new RatingDatabaseService().addRating(
-                new Rating("", userId, portfolioId, stars));
+            await new RatingDatabaseService()
+                .addRating(new Rating("", userId, portfolioId, stars));
             _showDialog(context, "Voted!",
                 "You voted with " + stars.toString() + " stars");
           },

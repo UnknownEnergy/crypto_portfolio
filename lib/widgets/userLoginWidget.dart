@@ -24,7 +24,15 @@ class UserLoginWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text(user.email + " UUID: " + user.id.substring(0,5)+"..."),
+                      Text(
+                        user.email +
+                            " UUID: " +
+                            user.id.substring(0, 5) +
+                            "...",
+                        style: new TextStyle(
+                          fontSize: 25.0,
+                        ),
+                      ),
                     ]),
                 onTap: () => {
                   Navigator.push(

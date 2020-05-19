@@ -38,8 +38,12 @@ class PortfolioOverviewWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Text(portfolio.name +
-                          getOwnPortfolioText(portfolio, user)),
+                      Text(
+                        portfolio.name + getOwnPortfolioText(portfolio, user),
+                        style: new TextStyle(
+                          fontSize: 25.0,
+                        ),
+                      ),
                       buildStarRating(user.id, portfolio.id),
                     ]),
                 onTap: () => {
@@ -79,7 +83,8 @@ class PortfolioOverviewWidget extends StatelessWidget {
             onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ManagePortfolioWidget(new Portfolio('', '', '', user.id), user))),
+                    builder: (context) => ManagePortfolioWidget(
+                        new Portfolio('', '', '', user.id), user))),
           ),
           SpeedDialChild(
             child: Icon(Icons.camera_alt),
@@ -95,7 +100,8 @@ class PortfolioOverviewWidget extends StatelessWidget {
   }
 }
 
-Future<void> onScanQr(String userId, String portfolioId, BuildContext context) async {
+Future<void> onScanQr(
+    String userId, String portfolioId, BuildContext context) async {
   String portfolioId = await scanner.scan();
   await new ModeratorDatabaseService()
       .addModerator(new Moderator("", userId, portfolioId));

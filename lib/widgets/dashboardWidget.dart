@@ -20,7 +20,12 @@ class DashboardWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Text("Dashboard of " + user.email),
+          Text(
+            "Dashboard of " + user.email,
+            style: new TextStyle(
+              fontSize: 25.0,
+            ),
+          ),
           buildDashboardChart(user),
         ]);
   }
