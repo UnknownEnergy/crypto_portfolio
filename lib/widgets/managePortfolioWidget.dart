@@ -197,14 +197,12 @@ class _ManagePortfolioWidgetState extends State<ManagePortfolioWidget> {
     TextEditingController percentController = new TextEditingController();
     percentController.text = portfolioCoin.percent.toString();
 
-//    var coin = await new CoinDatabaseService().getCoin(portfolioCoin.coinId);
-
     columns.add(Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           //TODO preselect not working?
-          createSearchableCoinFutureBuilder('Bitcoin', (Coin coin) {
+          createSearchableCoinFutureBuilder(portfolioCoin.coinId, (Coin coin) {
             portfolioCoin.coinId = coin.id;
           }),
           TextField(
@@ -241,9 +239,9 @@ class _ManagePortfolioWidgetState extends State<ManagePortfolioWidget> {
 
           List<Coin> coins = snap.data;
           return SearchableDropdown.single(
-            items: coins.toList().map<DropdownMenuItem<Coin>>((Coin coin) {
-              return DropdownMenuItem<Coin>(
-                value: coin,
+            items: coins.toList().map<DropdownMenuItem<String>>((Coin coin) {
+              return DropdownMenuItem<String>(
+                value: coin.id,
                 child: Text(coin.name),
               );
             }).toList(),
