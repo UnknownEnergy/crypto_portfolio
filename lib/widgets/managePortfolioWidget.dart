@@ -202,8 +202,8 @@ class _ManagePortfolioWidgetState extends State<ManagePortfolioWidget> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           //TODO preselect not working?
-          createSearchableCoinFutureBuilder(portfolioCoin.coinId, (Coin coin) {
-            portfolioCoin.coinId = coin.id;
+          createSearchableCoinFutureBuilder(portfolioCoin.coinId, (String coinId) {
+            portfolioCoin.coinId = coinId;
           }),
           TextField(
               obscureText: false,
@@ -217,8 +217,10 @@ class _ManagePortfolioWidgetState extends State<ManagePortfolioWidget> {
               )),
           RaisedButton(
             onPressed: () async {
-              await new PortfolioCoinDatabaseService()
-                  .deletePortfolioCoin(portfolioCoin.id);
+              if (portfolioCoin.id.isNotEmpty) {
+                await new PortfolioCoinDatabaseService()
+                    .deletePortfolioCoin(portfolioCoin.id);
+              }
               setState(() {
                 portfolioCoins.remove(portfolioCoin);
               });
