@@ -10,6 +10,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 
+import 'homeWidget.dart';
+
 class ManagePortfolioWidget extends StatefulWidget {
   Portfolio currentPortfolio;
   User user;
@@ -42,65 +44,62 @@ class _ManagePortfolioWidgetState extends State<ManagePortfolioWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: DefaultTabController(
-            length: 2,
-            child: Scaffold(
-              appBar: AppBar(
-                title: Text('Manage Portfolio'),
-              ),
-              body: SingleChildScrollView(
-                  child: Column(children: [
-                TextField(
-                  obscureText: false,
-                  controller: portfolioNameController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Portfolio Name',
-                  ),
-                ),
-                TextField(
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 3,
-                  controller: portfolioDescController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Portfolio Description',
-                  ),
-                ),
-                createFutureBuilderOfPortfolioCoins(),
-                RaisedButton(
-                  onPressed: () async {
-                    var coins = await new CoinDatabaseService().getAllCoins();
-                    Coin defaultCoin =
-                        coins.where((coin) => coin.name == 'Bitcoin').first;
-                    setState(() {
-                      portfolioCoins.add(new PortfolioCoin(
-                          '', defaultCoin.id, currentPortfolio.id, 0));
-                    });
-                  },
-                  child: Text('New Coin'),
-                ),
-                RaisedButton(
-                  onPressed: () {
-                    onSaveButton(context);
-                  },
-                  child: Text('Save'),
-                ),
-                RaisedButton(
-                  onPressed: () async {
-                    await onDeleteButton(context);
-                  },
-                  child: Text('Delete'),
-                ),
-                RaisedButton(
-                  onPressed: () {
-                    onManageModsButton(context);
-                  },
-                  child: Text('Manage Moderators'),
-                ),
-              ])),
-            )));
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Manage Portfolio'),
+      ),
+      body: SingleChildScrollView(
+          child: Column(children: [
+        TextField(
+          obscureText: false,
+          controller: portfolioNameController,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Portfolio Name',
+          ),
+        ),
+        TextField(
+          keyboardType: TextInputType.multiline,
+          maxLines: 3,
+          controller: portfolioDescController,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Portfolio Description',
+          ),
+        ),
+        createFutureBuilderOfPortfolioCoins(),
+        RaisedButton(
+          onPressed: () async {
+            var coins = await new CoinDatabaseService().getAllCoins();
+            Coin defaultCoin =
+                coins.where((coin) => coin.name == 'Bitcoin').first;
+            setState(() {
+              portfolioCoins.add(new PortfolioCoin(
+                  '', defaultCoin.id, currentPortfolio.id, 0));
+            });
+          },
+          child: Text('New Coin'),
+        ),
+        RaisedButton(
+          onPressed: () {
+            onSaveButton(context);
+          },
+          child: Text('Save'),
+        ),
+        RaisedButton(
+          onPressed: () async {
+            await onDeleteButton(context);
+          },
+          child: Text('Delete'),
+        ),
+        RaisedButton(
+          onPressed: () {
+            onManageModsButton(context);
+          },
+          child: Text('Manage Moderators'),
+        ),
+      ])),
+    );
   }
 
   void onManageModsButton(BuildContext context) {
@@ -135,7 +134,8 @@ class _ManagePortfolioWidgetState extends State<ManagePortfolioWidget> {
         });
       });
     }
-    Navigator.pop(context);
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => HomeWidget(user)));
   }
 
   Future<void> updateOldPortfolio() async {

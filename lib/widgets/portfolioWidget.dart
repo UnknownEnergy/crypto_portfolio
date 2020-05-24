@@ -24,49 +24,46 @@ class PortfolioWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: DefaultTabController(
-            length: 2,
-            child: Scaffold(
-              appBar: AppBar(
-                title: Text('Portfolio'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Portfolio'),
+      ),
+      body: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(
+              portfolio.name,
+              style: new TextStyle(
+                fontSize: 25.0,
               ),
-              body: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      portfolio.name,
-                      style: new TextStyle(
-                        fontSize: 25.0,
-                      ),
-                    ),
-                    Text(
-                      portfolio.description,
-                      style: new TextStyle(
-                        fontSize: 15.0,
-                      ),
-                    ),
-                    buildPortfolioChart(portfolio.id),
-                    buildStarRating(user.id, portfolio.id),
-                    QrImage(
-                      data: portfolio.id,
-                      version: QrVersions.auto,
-                      size: 200.0,
-                    ),
-                  ]),
-              floatingActionButton: FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              ManagePortfolioWidget(portfolio, user)));
-                },
-                child: Icon(Icons.edit),
-                backgroundColor: Colors.red,
+            ),
+            Text(
+              portfolio.description,
+              style: new TextStyle(
+                fontSize: 15.0,
               ),
-            )));
+            ),
+            buildPortfolioChart(portfolio.id),
+            buildStarRating(user.id, portfolio.id),
+            QrImage(
+              data: portfolio.id,
+              version: QrVersions.auto,
+              size: 200.0,
+            ),
+          ]),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      ManagePortfolioWidget(portfolio, user)));
+        },
+        child: Icon(Icons.edit),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   FutureBuilder<List<dynamic>> buildPortfolioChart(String portfolioId) {
