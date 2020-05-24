@@ -25,4 +25,15 @@ class Portfolio {
   String toString() {
     return 'Portfolio{id: $id, name: $name, description: $description, ownerUserId: $ownerUserId}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      other is Portfolio &&
+          name == other.name &&
+          description == other.description &&
+          ownerUserId == other.ownerUserId;
+
+  @override
+  int get hashCode =>
+      name.hashCode ^ description.hashCode ^ ownerUserId.hashCode;
 }

@@ -25,4 +25,14 @@ class PortfolioCoin {
   String toString() {
     return 'PortfolioCoin{id: $id, coinId: $coinId, portfolioId: $portfolioId, percent: $percent}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      other is PortfolioCoin &&
+          coinId == other.coinId &&
+          portfolioId == other.portfolioId &&
+          percent == other.percent;
+
+  @override
+  int get hashCode => coinId.hashCode ^ portfolioId.hashCode ^ percent.hashCode;
 }

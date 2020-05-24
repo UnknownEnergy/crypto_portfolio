@@ -34,12 +34,78 @@ class _ManagePortfolioWidgetState extends State<ManagePortfolioWidget> {
   User user;
   List<PortfolioCoin> portfolioCoins = new List<PortfolioCoin>();
 
+  var startPortfolio;
+  List<PortfolioCoin> startCoins;
+
   _ManagePortfolioWidgetState(Portfolio currentPortfolio, User user) {
     this.currentPortfolio = currentPortfolio;
     this.user = user;
 
     portfolioNameController.text = currentPortfolio?.name ?? " ";
     portfolioDescController.text = currentPortfolio?.description ?? " ";
+
+    getStartPortfolio(currentPortfolio.id);
+  }
+
+  Future<void> getStartPortfolio(String portfolioId) async {
+    startPortfolio =
+        await new PortfolioDatabaseService().getPortfolio(currentPortfolio.id);
+    startCoins = await new PortfolioCoinDatabaseService()
+        .getAllPortfolioCoinsOfPortfolio(currentPortfolio.id);
+  }
+
+  Future<void> compareWithEndPortfolio(String portfolioId) async {
+    var endPortfolio =
+        await new PortfolioDatabaseService().getPortfolio(currentPortfolio.id);
+    List<PortfolioCoin> endCoins = await new PortfolioCoinDatabaseService()
+        .getAllPortfolioCoinsOfPortfolio(currentPortfolio.id);
+
+    bool isCoinMatch = true;
+    if (endCoins.length != startCoins.length) {
+      isCoinMatch = false;
+    } else {
+      endCoins.forEach((portfolioCoin) {
+        if (startCoins
+                .firstWhere((element) => element.id == portfolioCoin.id) !=
+            portfolioCoin) {
+          isCoinMatch = false;
+          return;
+        }
+      });
+    }
+    if (startPortfolio == endPortfolio && isCoinMatch) {
+      savePortfolio();
+    } else {
+      _showDialog(context, "Portfolio changed!",
+          "Someone changed the portfolio in the meantime! Are you sure you want to continue?");
+    }
+  }
+
+  void _showDialog(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text(title),
+          content: new Text(message),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Continue and override"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                savePortfolio();
+              },
+            ),
+            new FlatButton(
+              child: new Text("Stop"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -111,12 +177,7 @@ class _ManagePortfolioWidgetState extends State<ManagePortfolioWidget> {
   }
 
   void onSaveButton(BuildContext context) {
-    if (currentPortfolio.id.isNotEmpty) {
-      updateOldPortfolio();
-    } else {
-      createNewPortfolio();
-    }
-    Navigator.pop(context);
+    compareWithEndPortfolio(currentPortfolio.id);
   }
 
   Future onDeleteButton(BuildContext context) async {
@@ -202,7 +263,8 @@ class _ManagePortfolioWidgetState extends State<ManagePortfolioWidget> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           //TODO preselect not working?
-          createSearchableCoinFutureBuilder(portfolioCoin.coinId, (String coinId) {
+          createSearchableCoinFutureBuilder(portfolioCoin.coinId,
+              (String coinId) {
             portfolioCoin.coinId = coinId;
           }),
           TextField(
@@ -256,5 +318,14 @@ class _ManagePortfolioWidgetState extends State<ManagePortfolioWidget> {
           );
         },
         future: new CoinDatabaseService().getAllCoins());
+  }
+
+  void savePortfolio() {
+    if (currentPortfolio.id.isNotEmpty) {
+      updateOldPortfolio();
+    } else {
+      createNewPortfolio();
+    }
+    Navigator.pop(context);
   }
 }
