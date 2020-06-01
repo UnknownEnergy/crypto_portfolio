@@ -2,15 +2,21 @@
 
 Crypto Portfolio
 
+## Requirements
+flutter  
+android sdk  
+
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+You also need to add an auth file to the firebase database:  
+`android/app/google-services.json`  
+An example file is provided in the same folder.
 
-A few resources to get you started if this is your first Flutter project:
+To generate your own Android APK execute:  
+`flutter build apk`  
+A generated apk can be found via following path:  
+`build/app/outputs/flutter-apk/app-release.apk` 
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Documentation
+A PDF documentation file can be found via following link:  
+[Documentation](documentation.pdf)
