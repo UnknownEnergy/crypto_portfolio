@@ -20,3 +20,7 @@ A generated apk can be found via following path:
 ## Documentation
 A PDF documentation file can be found via following link:  
 [Documentation](documentation.pdf)
+
+## Demo video
+You can watch a demo video here:  
+[Demo Video](demo_vid.mp4)
