@@ -177,7 +177,11 @@ class _ManagePortfolioWidgetState extends State<ManagePortfolioWidget> {
   }
 
   void onSaveButton(BuildContext context) {
-    compareWithEndPortfolio(currentPortfolio.id);
+    if (currentPortfolio.id.isEmpty) {
+      savePortfolio();
+    } else {
+      compareWithEndPortfolio(currentPortfolio.id);
+    }
   }
 
   Future onDeleteButton(BuildContext context) async {
